@@ -1,0 +1,16 @@
+{
+  "domain": "vakio_base_smart",
+  "name": "Vakio Base Smart",
+  "codeowners": [
+    "@Anti-Sh"
+  ],
+  "config_flow": true,
+  "version": "0.1.0",
+  "dependencies": [],
+  "documentation": "https://www.home-assistant.io/integrations/vakio_base_smart",
+  "homekit": {},
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "ssdp": [],
+  "zeroconf": []
+}
