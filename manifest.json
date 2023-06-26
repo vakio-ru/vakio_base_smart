@@ -7,7 +7,7 @@
   "config_flow": true,
   "version": "0.1.0",
   "dependencies": [],
-  "documentation": "https://www.home-assistant.io/integrations/vakio_base_smart",
+  "documentation": "https://github.com/Anti-Sh/vakio_base_smart/#readme",
   "homekit": {},
   "iot_class": "cloud_polling",
   "requirements": [],
