@@ -1,0 +1,19 @@
+name: HACS Action and hassfest
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  hacs:
+    name: HACS Action
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: HACS Action
+        uses: "hacs/action@main"
+        with:
+          category: "integration"
+      - uses: "actions/checkout@v3"
+      - uses: "home-assistant/actions/hassfest@master"
