@@ -9,7 +9,8 @@
 2. [Подключение прибора к брокеру](#connect)
 3. [Установка интеграции](#setup)
 
-Если столкнулись с ошибками:
+Дополнительно:
+- [Полезные ресурсы](#sources)
 - [Возможные ошибки и способы их решения](#errors)
 ---
 
@@ -66,6 +67,26 @@
 2. Найдите бренд "Vakio" и нажмите на него.
 3. Выберите интеграцию, опираясь на наименование.
 4. В появившемся окне введите значения, которые вводили в пункте [2. Подключение прибора к брокеру](#connect)
+
+---
+
+## <a name="sources"></a> Полезные ресурсы
+
+- Интеграции HomeAssistant
+  - [Atmosphere](https://github.com/maxmostovoy/vakio_atmosphere)
+  - [Base Smart](https://github.com/maxmostovoy/vakio_base_smart)
+  - [KIV](https://github.com/maxmostovoy/vakio_kiv)
+  - [Openair](https://github.com/maxmostovoy/vakio_openair)
+
+- Модули Majordomo
+  - [Все устройства](https://github.com/maxmostovoy/vakio_smart_control)
+
+- Sprut.hub
+  - [BaseSmart + Wirenboard](https://comf.life/kak-dobavit-rekuperator-vakio-v-umnyj-dom-wirenboard-yandeks-alisu-apple-home-spruthub.html)
+
+- Дополнительно
+  - [Public API](https://github.com/maxmostovoy/vakio-public-api)
+  - [Подключение устройства к MQTT-брокеру](https://vakio.ru/vakio-mqtt.pdf)
 
 ---
 
