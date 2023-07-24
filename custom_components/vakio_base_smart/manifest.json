@@ -5,13 +5,15 @@
     "@Anti-Sh"
   ],
   "config_flow": true,
-  "version": "0.1.5",
   "dependencies": [],
   "documentation": "https://github.com/maxmostovoy/vakio_base_smart/#readme",
   "homekit": {},
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/maxmostovoy/vakio_atmosphere/issues",
-  "requirements": ["paho-mqtt==1.6.1"],
+  "requirements": [
+    "paho-mqtt==1.6.1"
+  ],
   "ssdp": [],
+  "version": "0.1.5",
   "zeroconf": []
 }
