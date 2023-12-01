@@ -1,19 +1,15 @@
 {
   "domain": "vakio_base_smart",
   "name": "Vakio Base Smart",
-  "codeowners": [
-    "@Anti-Sh"
-  ],
+  "codeowners": ["@Anti-Sh"],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/maxmostovoy/vakio_base_smart/#readme",
   "homekit": {},
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/maxmostovoy/vakio_atmosphere/issues",
-  "requirements": [
-    "paho-mqtt==1.6.1"
-  ],
+  "requirements": ["paho-mqtt==1.6.1"],
   "ssdp": [],
-  "version": "0.1.6",
+  "version": "0.2.0",
   "zeroconf": []
 }
