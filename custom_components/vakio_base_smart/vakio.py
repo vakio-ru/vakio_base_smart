@@ -1,27 +1,30 @@
-"""Service classes for interacting with Vakio devices"""
+"""Service classes for interacting with Vakio devices."""
 from __future__ import annotations
+
 import asyncio
+import contextlib
 import json
 import logging
 import random
 from typing import Any
+
 import paho.mqtt.client as mqtt
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
-    DEFAULT_TIMEINTERVAL,
-    DOMAIN,
+    BASESMART_STATE_OFF,
+    BASESMART_STATE_ON,
     CONF_HOST,
     CONF_PASSWORD,
     CONF_PORT,
     CONF_TOPIC,
     CONF_USERNAME,
-    BASESMART_STATE_OFF,
-    BASESMART_STATE_ON,
-    OPT_SMART_TOPIC_PREFIX,
+    DEFAULT_TIMEINTERVAL,
+    DOMAIN,
     OPT_SMART_TOPIC_ENDPOINT,
+    OPT_SMART_TOPIC_PREFIX,
 )
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
@@ -42,7 +45,7 @@ class MqttClient:
     def __init__(
         self,
         hass: HomeAssistant,
-        data: dict(str, Any),
+        data: dict(str, Any),  # type: ignore
         coordinator: Coordinator | None = None,
     ) -> None:
         """Initialize."""
@@ -66,22 +69,20 @@ class MqttClient:
         self.is_connected = False
 
     def on_message(self, client, userdata, message: mqtt.MQTTMessage):
-        """Callback on message"""
+        """Реакция на сообщение."""
         key = str.split(message.topic, "/")[-1]
         self._client.unsubscribe(topic=message.topic)
         value = message.payload.decode()
         if value is not None:
-            try:
+            with contextlib.suppress(ValueError):
                 value = int(value)
-            except ValueError:
-                pass
 
-        self._coordinator.condition[key] = value
+        self._coordinator.condition[key] = value  # type: ignore
         # for k, val in self._coordinator.condition.items():
         #     _LOGGER.error("%s: %s", k, val)
 
     def on_connect(self, client, userdata, flags, rc):  # pylint: disable=invalid-name
-        """Callback on connect"""
+        """Реакция на подключение."""
         self.is_connected = True
 
     async def connect(self) -> bool:
@@ -98,7 +99,7 @@ class MqttClient:
         return False
 
     async def disconnect(self) -> None:
-        """Disconnect from the broker"""
+        """Disconnect from the broker."""
 
         def stop() -> None:
             """Stop the MQTT client."""
@@ -120,7 +121,7 @@ class MqttClient:
             return False
 
     async def subscribe(self) -> None:
-        """Подписка на топики"""
+        """Подписка на топики."""
         self.subscribes_count += 1
         async with self._paho_lock:
             _, mid = await self.hass.async_add_executor_job(
@@ -132,13 +133,13 @@ class MqttClient:
 
     async def get_condition(
         self,
-    ) -> dict(str, Any):
-        """Get condition of device"""
+    ) -> dict(str, Any):  # type: ignore
+        """Get condition of device."""
         await self.subscribe()
-        return self._coordinator.condition
+        return self._coordinator.condition  # type: ignore
 
-    async def publish(self, endpoint: str, msg: str, prefix: str = None) -> bool:
-        """Publish commands to topic"""
+    async def publish(self, endpoint: str, msg: str, prefix: str | None = None) -> bool:
+        """Publish commands to topic."""
         topic = self.data[CONF_TOPIC] + "/" + endpoint
         if prefix is not None:
             topic = prefix + "/" + topic
@@ -154,9 +155,10 @@ class MqttClient:
 
 
 class Coordinator(DataUpdateCoordinator):
-    """Class for interact with Broker and HA"""
+    """Class for interact with Broker and HA."""
 
-    def __init__(self, hass: HomeAssistant, data: dict(str, Any)) -> None:
+    def __init__(self, hass: HomeAssistant, data: dict(str, Any)) -> None:  # type: ignore
+        """Функция инициализации."""
         super().__init__(
             hass, _LOGGER, name=DOMAIN, update_interval=DEFAULT_TIMEINTERVAL
         )
@@ -171,7 +173,7 @@ class Coordinator(DataUpdateCoordinator):
         self.is_logged_in = False
 
     async def async_login(self) -> bool:
-        """Авторизация в брокере"""
+        """Авторизация в брокере."""
         if self.is_logged_in is True:
             return True
 
@@ -183,65 +185,66 @@ class Coordinator(DataUpdateCoordinator):
         return status
 
     async def _async_update_data(self) -> bool:
-        """Get all data"""
+        """Get all data."""
         await self.mqttc.get_condition()
         return True
 
     async def _async_update(self, now) -> None:
-        """
+        """Async Update.
+
         Функция регистритуется в hass, во всех датчиках и устройствах и контролирует
         обновление данных через API не чаще чем раз в 2 секунды.
         """
         await self.mqttc.get_condition()
 
     async def speed(self, value: int | None = None) -> int | bool | None:
-        """Speed of fan"""
+        """Speed of fan."""
         if value is None:
             return self.condition[SPEED_ENDPOINT]
 
-        return await self.mqttc.publish(SPEED_ENDPOINT, value)
+        return await self.mqttc.publish(SPEED_ENDPOINT, value)  # type: ignore
 
     async def state(self, value: str | None = None) -> str | bool | None:
-        """State of device"""
+        """State of device."""
         if value is None:
             return self.condition[STATE_ENDPOINT]
 
         return await self.mqttc.publish(STATE_ENDPOINT, value)
 
     async def workmode(self, value: str | None = None) -> str | bool | None:
-        """Workmode of device: manual or super_auto"""
+        """Workmode of device: manual or super_auto."""
         if value is None:
             return self.condition[WORKMODE_ENDPOINT]
 
         return await self.mqttc.publish(WORKMODE_ENDPOINT, value)
 
     def get_speed(self) -> int | bool | None:
-        """Speed of fan"""
+        """Speed of fan."""
         return self.condition[SPEED_ENDPOINT]
 
     def get_state(self) -> str | bool | None:
-        """State of device"""
+        """State of device."""
         return self.condition[STATE_ENDPOINT]
 
     def get_workmode(self) -> str | bool | None:
-        """Workmode of device: manual or super_auto"""
+        """Workmode of device: manual or super_auto."""
         return self.condition[WORKMODE_ENDPOINT]
 
     async def turn_on(self) -> bool:
-        """Включение устройства"""
-        return await self.state(BASESMART_STATE_ON)
+        """Включение устройства."""
+        return await self.state(BASESMART_STATE_ON)  # type: ignore
 
     async def turn_off(self) -> bool:
-        """Выключение устройства"""
-        return await self.state(BASESMART_STATE_OFF)
+        """Выключение устройства."""
+        return await self.state(BASESMART_STATE_OFF)  # type: ignore
 
     def is_on(self) -> bool:
-        """Возвращается bool значение \"Включено ли устройство\" """
+        """Возвращается `bool` значение 'Включено ли устройство'."""
         current_state = self.get_state()
         return current_state == BASESMART_STATE_ON
 
     async def update_smart_mode(self, emerg_hunt: int, gate: int, speed: int) -> None:
-        """Изменение параметров режима SMART"""
+        """Изменение параметров режима SMART."""
         command = {
             "settings": [
                 {"gate": gate},

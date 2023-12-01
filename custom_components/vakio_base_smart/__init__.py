@@ -5,23 +5,13 @@ import asyncio
 import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    Platform,
-)
-import homeassistant.core as ha
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady, ConfigEntryAuthFailed
+from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.typing import ConfigType
 
-from .const import (
-    DOMAIN,
-    ERROR_AUTH,
-    ERROR_CONFIG_NO_TREADY,
-    PLATFORMS,
-)
-from .vakio import MqttClient, Coordinator
+from .const import DOMAIN, ERROR_AUTH, ERROR_CONFIG_NO_TREADY, PLATFORMS
+from .vakio import Coordinator, MqttClient
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
@@ -71,7 +61,6 @@ async def config_entry_update_listener(
 ) -> None:
     """Функция вызывается при обновлении конфигурации."""
     await hass.config_entries.async_reload(config_entry.entry_id)
-    return
 
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:

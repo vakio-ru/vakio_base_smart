@@ -20,14 +20,14 @@ from homeassistant.helpers.selector import (
 )
 
 from .const import (
-    DOMAIN,
+    CONF_HOST,
+    CONF_PASSWORD,
+    CONF_PORT,
+    CONF_TOPIC,
+    CONF_USERNAME,
     DEFAULT_PORT,
     DEFAULT_TOPIC,
-    CONF_HOST,
-    CONF_PORT,
-    CONF_USERNAME,
-    CONF_PASSWORD,
-    CONF_TOPIC,
+    DOMAIN,
 )
 from .vakio import MqttClient
 
@@ -56,10 +56,10 @@ TEMP_SELECTOR = vol.All(
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_HOST): TEXT_SELECTOR,
-        vol.Required(CONF_PORT, default=DEFAULT_PORT): PORT_SELECTOR,
+        vol.Required(CONF_PORT, default=DEFAULT_PORT): PORT_SELECTOR,  # type: ignore
         vol.Optional(CONF_USERNAME): TEXT_SELECTOR,
         vol.Optional(CONF_PASSWORD): PASSWORD_SELECTOR,
-        vol.Required(CONF_TOPIC, default=DEFAULT_TOPIC): TEXT_SELECTOR,
+        vol.Required(CONF_TOPIC, default=DEFAULT_TOPIC): TEXT_SELECTOR,  # type: ignore
     }
 )
 

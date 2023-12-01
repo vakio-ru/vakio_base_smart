@@ -1,5 +1,6 @@
 """Constants for the Vakio Openair integration."""
 import datetime
+
 from homeassistant.const import Platform
 
 DOMAIN = "vakio_base_smart"
