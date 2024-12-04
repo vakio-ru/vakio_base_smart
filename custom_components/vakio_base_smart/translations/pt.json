@@ -1,23 +1,23 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Device is already configured"
+            "already_configured": "O dispositivo já está configurado"
         },
         "error": {
-            "cannot_connect": "Failed to connect",
-            "invalid_auth": "Invalid authentication",
-            "unknown": "Unexpected error"
+            "cannot_connect": "Não foi possível ligar",
+            "invalid_auth": "Autenticação inválida",
+            "unknown": "Erro inesperado"
         },
         "step": {
             "user": {
                 "data": {
-                    "host": "Host",
-                    "password": "Password",
-                    "port": "Port",
-                    "topic": "Topic",
-                    "username": "Username"
+                    "host": "Servidor",
+                    "password": "Palavra-passe",
+                    "port": "Porta",
+                    "topic": "Tópico",
+                    "username": "Nome de utilizador"
                 },
-                "description": "Please enter the connection information of your MQTT broker."
+                "description": "Por favor, introduza as informações de ligação do seu broker MQTT."
             }
         }
     }
