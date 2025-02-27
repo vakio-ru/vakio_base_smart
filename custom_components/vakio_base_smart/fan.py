@@ -27,13 +27,16 @@ from .const import (
 )
 from .vakio import Coordinator
 
-percentage = ordered_list_item_to_percentage(BASESMART_SPEEDS_LIST, BASESMART_SPEED_01)
+percentage = ordered_list_item_to_percentage(
+    BASESMART_SPEEDS_LIST, BASESMART_SPEED_01)
 named_speed = percentage_to_ordered_list_item(BASESMART_SPEEDS_LIST, 14)
 
 FULL_SUPPORT = (
     FanEntityFeature.SET_SPEED
     | FanEntityFeature.DIRECTION
     | FanEntityFeature.OSCILLATE
+    | FanEntityFeature.TURN_ON
+    | FanEntityFeature.TURN_OFF
     | FanEntityFeature.PRESET_MODE
 )
 LIMITED_SUPPORT = FanEntityFeature.SET_SPEED | FanEntityFeature.PRESET_MODE
