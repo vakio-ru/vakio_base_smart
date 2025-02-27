@@ -39,7 +39,7 @@ FULL_SUPPORT = (
     | FanEntityFeature.TURN_OFF
     | FanEntityFeature.PRESET_MODE
 )
-LIMITED_SUPPORT = FanEntityFeature.SET_SPEED | FanEntityFeature.PRESET_MODE
+LIMITED_SUPPORT = FanEntityFeature.SET_SPEED | FanEntityFeature.PRESET_MODE | FanEntityFeature.TURN_ON | FanEntityFeature.TURN_OFF
 
 
 async def async_setup_entry(
