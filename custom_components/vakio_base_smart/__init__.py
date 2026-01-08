@@ -1,4 +1,5 @@
 """The Vakio Openair integration."""
+
 from __future__ import annotations
 
 import asyncio
@@ -30,9 +31,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})
 
-    data = {}
-    for key, value in config_entry.data.items():
-        data[key] = value
+    data = dict(config_entry.data.items())
 
     broker = MqttClient(hass, data)
 

@@ -1,4 +1,5 @@
 """Fan platform."""
+
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
@@ -8,7 +9,10 @@ from typing import Any
 from homeassistant.components.fan import FanEntity, FanEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import (
+    AddConfigEntryEntitiesCallback,
+    AddEntitiesCallback,
+)
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.util.percentage import (
@@ -27,8 +31,7 @@ from .const import (
 )
 from .vakio import Coordinator
 
-percentage = ordered_list_item_to_percentage(
-    BASESMART_SPEEDS_LIST, BASESMART_SPEED_01)
+percentage = ordered_list_item_to_percentage(BASESMART_SPEEDS_LIST, BASESMART_SPEED_01)
 named_speed = percentage_to_ordered_list_item(BASESMART_SPEEDS_LIST, 14)
 
 FULL_SUPPORT = (
@@ -39,14 +42,19 @@ FULL_SUPPORT = (
     | FanEntityFeature.TURN_OFF
     | FanEntityFeature.PRESET_MODE
 )
-LIMITED_SUPPORT = FanEntityFeature.SET_SPEED | FanEntityFeature.PRESET_MODE | FanEntityFeature.TURN_ON | FanEntityFeature.TURN_OFF
+LIMITED_SUPPORT = (
+    FanEntityFeature.SET_SPEED
+    | FanEntityFeature.PRESET_MODE
+    | FanEntityFeature.TURN_ON
+    | FanEntityFeature.TURN_OFF
+)
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, conf: ConfigEntry, entities: AddEntitiesCallback
+    hass: HomeAssistant, conf: ConfigEntry, entities: AddConfigEntryEntitiesCallback
 ) -> None:
     """Register settings of device."""
-    await async_setup_platform(hass, conf, entities)  # type: ignore
+    await async_setup_platform(hass, conf, entities)
 
 
 async def async_setup_platform(
@@ -56,26 +64,26 @@ async def async_setup_platform(
     info: DiscoveryInfoType | None = None,
 ) -> None:
     """Установка платформы в hass."""
-    topic = conf.data["topic"]  # type: ignore
+    topic = conf.data["topic"]
     basesmart = VakioBaseSmart(
         hass,
         topic,
         "Base Smart",
-        conf.entry_id,  # type: ignore
+        conf.entry_id,
         LIMITED_SUPPORT,
         BASESMART_WORKMODS_NAMES_LIST,
     )
     entities([basesmart])
-    coordinator: Coordinator = hass.data[DOMAIN][conf.entry_id]  # type: ignore
+    coordinator: Coordinator = hass.data[DOMAIN][conf.entry_id]
     await coordinator.async_login()
     async_track_time_interval(
         hass,
-        coordinator._async_update,  # pylint: disable=protected-access
+        coordinator._async_update,  # noqa: SLF001
         timedelta(seconds=1),
     )
     async_track_time_interval(
         hass,
-        basesmart._async_update,  # pylint: disable=protected-access
+        basesmart._async_update,  # noqa: SLF001
         timedelta(seconds=1),
     )
 
@@ -138,6 +146,17 @@ class VakioBaseSmart(VakioBaseSmartBase, FanEntity):
         return self._percentage
 
     @property
+    def is_on(self) -> bool | None:
+        """Return whether the fan is on.
+
+        Используем состояние из `Coordinator` как источник правды.
+        """
+        is_on = self.coordinator.is_on()
+        if is_on is None:
+            return None
+        return bool(is_on)
+
+    @property
     def speed_count(self) -> int:
         """Возвращает количество поддерживаемых скоростей."""
         return len(BASESMART_SPEEDS_LIST)
@@ -153,7 +172,8 @@ class VakioBaseSmart(VakioBaseSmartBase, FanEntity):
         return self._preset_modes
 
     async def async_set_percentage(
-        self, percentage: int  # pylint: disable=redefined-outer-name
+        self,
+        percentage: int,  # pylint: disable=redefined-outer-name
     ) -> None:
         """Установка скорости работы вентиляции в процентах."""
         # current_workmode = self.coordinator.get_workmode()
@@ -165,10 +185,11 @@ class VakioBaseSmart(VakioBaseSmartBase, FanEntity):
         await self.coordinator.turn_on()
         # Получение именованой скорости.
         speed: decimal.Decimal = percentage_to_ordered_list_item(
-            BASESMART_SPEEDS_LIST, percentage  # type: ignore
+            BASESMART_SPEEDS_LIST,
+            percentage,
         )
 
-        await self.coordinator.speed(speed)  # type: ignore
+        await self.coordinator.speed(speed)
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Переключение режима работы на основе пресета."""
@@ -195,14 +216,15 @@ class VakioBaseSmart(VakioBaseSmartBase, FanEntity):
         await self.coordinator.turn_on()
         # Получение именованой скорости.
         new_speed: decimal.Decimal = decimal.Decimal(0)
-        if percentage is not None:
+        if percentage is not None and percentage > 0:
             new_speed = percentage_to_ordered_list_item(
-                BASESMART_SPEEDS_LIST, percentage  # type: ignore
+                BASESMART_SPEEDS_LIST,
+                percentage,
             )
         else:
-            new_speed = BASESMART_SPEED_01  # type: ignore
+            new_speed = BASESMART_SPEED_01
 
-        await self.coordinator.speed(new_speed)  # type: ignore
+        await self.coordinator.speed(new_speed)
         self.update_all_options()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
@@ -254,9 +276,7 @@ class VakioBaseSmart(VakioBaseSmartBase, FanEntity):
             return True
 
         speed -= 1
-        named_speed = BASESMART_SPEEDS_LIST[
-            speed
-        ]  # pylint: disable=redefined-outer-name
+        named_speed = BASESMART_SPEEDS_LIST[speed]  # pylint: disable=redefined-outer-name
         new_speed_percentage = ordered_list_item_to_percentage(
             BASESMART_SPEEDS_LIST, named_speed
         )
@@ -293,6 +313,8 @@ class VakioBaseSmart(VakioBaseSmartBase, FanEntity):
 
     def workmode_command_to_name(self, workmode_command) -> str:
         """Возвращается название режима работы по команде."""
+        if workmode_command not in BASESMART_WORKMODS_LIST:
+            return "unknown"
         current_id = BASESMART_WORKMODS_LIST.index(workmode_command)
         return BASESMART_WORKMODS_NAMES_LIST[current_id]
 
@@ -305,7 +327,7 @@ class VakioBaseSmart(VakioBaseSmartBase, FanEntity):
         is_on: bool | None = self.coordinator.is_on()
         if not bool(is_on):
             # Вентиляция выключена.
-            if self._percentage is not None and self._percentage > 0:
+            if self._percentage is not None:
                 self._percentage = 0
                 return True
         elif self._percentage is None or self._percentage == 0:

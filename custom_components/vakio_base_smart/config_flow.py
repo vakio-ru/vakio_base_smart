@@ -1,4 +1,5 @@
 """Config flow for Vakio Base Smart integration."""
+
 from __future__ import annotations
 
 import logging
@@ -7,8 +8,8 @@ from typing import Any
 import voluptuous as vol
 
 from homeassistant import config_entries
+from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.selector import (
     NumberSelector,
@@ -56,10 +57,10 @@ TEMP_SELECTOR = vol.All(
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_HOST): TEXT_SELECTOR,
-        vol.Required(CONF_PORT, default=DEFAULT_PORT): PORT_SELECTOR,  # type: ignore
+        vol.Required(CONF_PORT, default=DEFAULT_PORT): PORT_SELECTOR,
         vol.Optional(CONF_USERNAME): TEXT_SELECTOR,
         vol.Optional(CONF_PASSWORD): PASSWORD_SELECTOR,
-        vol.Required(CONF_TOPIC, default=DEFAULT_TOPIC): TEXT_SELECTOR,  # type: ignore
+        vol.Required(CONF_TOPIC, default=DEFAULT_TOPIC): TEXT_SELECTOR,
     }
 )
 
@@ -86,7 +87,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the initial step."""
         errors: dict[str, str] = {}
         if user_input is not None:

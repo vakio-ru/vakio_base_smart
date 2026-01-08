@@ -1,4 +1,5 @@
 """Service classes for interacting with Vakio devices."""
+
 from __future__ import annotations
 
 import asyncio
@@ -45,7 +46,7 @@ class MqttClient:
     def __init__(
         self,
         hass: HomeAssistant,
-        data: dict(str, Any),  # type: ignore
+        data: dict(str, Any),
         coordinator: Coordinator | None = None,
     ) -> None:
         """Initialize."""
@@ -77,7 +78,7 @@ class MqttClient:
             with contextlib.suppress(ValueError):
                 value = int(value)
 
-        self._coordinator.condition[key] = value  # type: ignore
+        self._coordinator.condition[key] = value
         # for k, val in self._coordinator.condition.items():
         #     _LOGGER.error("%s: %s", k, val)
 
@@ -92,11 +93,12 @@ class MqttClient:
                 self._client.connect, self.data[CONF_HOST], self.data[CONF_PORT]
             )
             self._client.loop_start()
-            return True
         except OSError as err:
             _LOGGER.error("Failed to connect to MQTT server due to exception: %s", err)
 
-        return False
+            return False
+
+        return True
 
     async def disconnect(self) -> None:
         """Disconnect from the broker."""
@@ -116,9 +118,11 @@ class MqttClient:
 
         try:
             self._client.connect(self.data[CONF_HOST], self.data[CONF_PORT])
-            return True
-        except Exception:  # pylint: disable=broad-exception-caught
+
+        except Exception:  # noqa: BLE001
             return False
+
+        return True
 
     async def subscribe(self) -> None:
         """Подписка на топики."""
@@ -133,10 +137,10 @@ class MqttClient:
 
     async def get_condition(
         self,
-    ) -> dict(str, Any):  # type: ignore
+    ) -> dict(str, Any):
         """Get condition of device."""
         await self.subscribe()
-        return self._coordinator.condition  # type: ignore
+        return self._coordinator.condition
 
     async def publish(self, endpoint: str, msg: str, prefix: str | None = None) -> bool:
         """Publish commands to topic."""
@@ -157,7 +161,7 @@ class MqttClient:
 class Coordinator(DataUpdateCoordinator):
     """Class for interact with Broker and HA."""
 
-    def __init__(self, hass: HomeAssistant, data: dict(str, Any)) -> None:  # type: ignore
+    def __init__(self, hass: HomeAssistant, data: dict(str, Any)) -> None:
         """Функция инициализации."""
         super().__init__(
             hass, _LOGGER, name=DOMAIN, update_interval=DEFAULT_TIMEINTERVAL
@@ -202,7 +206,7 @@ class Coordinator(DataUpdateCoordinator):
         if value is None:
             return self.condition[SPEED_ENDPOINT]
 
-        return await self.mqttc.publish(SPEED_ENDPOINT, value)  # type: ignore
+        return await self.mqttc.publish(SPEED_ENDPOINT, value)
 
     async def state(self, value: str | None = None) -> str | bool | None:
         """State of device."""
@@ -232,11 +236,11 @@ class Coordinator(DataUpdateCoordinator):
 
     async def turn_on(self) -> bool:
         """Включение устройства."""
-        return await self.state(BASESMART_STATE_ON)  # type: ignore
+        return await self.state(BASESMART_STATE_ON)
 
     async def turn_off(self) -> bool:
         """Выключение устройства."""
-        return await self.state(BASESMART_STATE_OFF)  # type: ignore
+        return await self.state(BASESMART_STATE_OFF)
 
     def is_on(self) -> bool:
         """Возвращается `bool` значение 'Включено ли устройство'."""
